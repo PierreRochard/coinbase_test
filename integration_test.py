@@ -11,12 +11,12 @@ req_payloads = [
         'quote_currency': 'USD',
         'amount': '50.00000000'
     },
-    # {
-    #     'action': 'sell',
-    #     'base_currency': 'BTC',
-    #     'quote_currency': 'USD',
-    #     'amount': '10.00000000'
-    # },
+    {
+        'action': 'sell',
+        'base_currency': 'BTC',
+        'quote_currency': 'USD',
+        'amount': '50.00000000'
+    },
     # {
     #     'action': 'buy',
     #     'base_currency': 'USD',
