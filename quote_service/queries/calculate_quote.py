@@ -27,8 +27,7 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal):
 
     cumulative_subquery = (
         db.session.query(orders_1.c.price.label('price'),
-                         orders_1.c.size.label('size'),
-                         func.sum(orders_2.c.size).label('cumulative_size'))
+                         func.sum(orders_2.c.size).label('size'))
             .filter(cumulative_filter)
             .filter(orders_2.c.side == side)
             .filter(orders_2.c.pair_id == pair_id)
@@ -42,10 +41,14 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal):
             func.sum(
                 case(
                     [
-                        (cumulative_subquery.c.cumulative_size - amount <= 0,
-                         Orders.size),
-                        (cumulative_subquery.c.cumulative_size - amount > 0,
-                         Orders.size - cumulative_subquery.c.cumulative_size + amount)
+                        (
+                            cumulative_subquery.c.size - amount <= 0,
+                            Orders.size
+                        ),
+                        (
+                            cumulative_subquery.c.size - amount > 0,
+                            Orders.size - cumulative_subquery.c.size + amount
+                        )
                     ],
                     else_=0)
                 * Orders.price
@@ -54,7 +57,7 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal):
             .join(cumulative_subquery,
                   cumulative_subquery.c.price == Orders.price)
             .filter(Orders.side == side)
-            .filter(cumulative_subquery.c.cumulative_size - amount < Orders.size)
+            .filter(cumulative_subquery.c.size - amount < Orders.size)
             .order_by(price_sorting)
             .scalar()
     )
