@@ -7,3 +7,4 @@
 5. Flask-Restful (instead of Flask-Restless) since we are only building one endpoint that won't be a simple CRUD operation.
 6. To keep things simple I'm not implementing a caching strategy for the order books, we're going to get the relevant order book with each request.
 7. I have the products/pairs load once when the app starts, since that does not change often.
+8. Again to simplify, no asynchronous requests to GDAX or worrying about what happens if multiple requests come in simultaneously.

@@ -1,8 +1,8 @@
 from flask import Flask
 
 from quote_service.api import QuoteService
-from quote_service.extensions import admin, db, api
-from quote_service.models import Orders, CurrencyPairs
+from quote_service.extensions import api, db
+from quote_service.models import CurrencyPairs, Orders
 
 
 def create_app():

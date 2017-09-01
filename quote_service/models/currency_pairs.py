@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, UniqueConstraint
 
-from ..exchange_service import ExchangeService
-from ..extensions import db
+from quote_service.exchange_service import ExchangeService
+from quote_service.extensions import db
 
 
 class CurrencyPairs(db.Model):
@@ -12,7 +12,7 @@ class CurrencyPairs(db.Model):
         quote_currency: The currency to quote the price in
 
     """
-    __tablename__ = 'pairs'
+    __tablename__ = 'currency_pairs'
     __table_args__ = (
         UniqueConstraint('base_currency',
                          'quote_currency',

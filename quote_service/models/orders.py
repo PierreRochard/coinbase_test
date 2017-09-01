@@ -1,6 +1,10 @@
-from sqlalchemy import Column, ForeignKey, Integer, Numeric, String, UniqueConstraint
+from sqlite3 import IntegrityError
 
-from ..extensions import db
+from sqlalchemy import Column, ForeignKey, Integer, Numeric, String, \
+    UniqueConstraint
+
+from quote_service.exchange_service import ExchangeService
+from quote_service.extensions import db
 
 from .currency_pairs import CurrencyPairs
 
@@ -27,3 +31,29 @@ class Orders(db.Model):
     pair_id = Column(Integer,
                      ForeignKey(CurrencyPairs.id),
                      nullable=False)
+
+    @classmethod
+    def insert_orders(cls, pair_id):
+        """
+        Retrieves limit orders from GDAX and inserts them into the orders table.
+        """
+        base, quote = (
+            db.session.query(CurrencyPairs.base_currency,
+                             CurrencyPairs.quote_currency)
+            .filter(CurrencyPairs.id == pair_id)
+                .one()
+        )
+        orders = ExchangeService.get_orders(base, quote)
+        for order in orders:
+            new_order_record = cls(**order)
+            new_order_record.pair_id = pair_id
+            db.session.add(new_order_record)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                continue
+
+    @classmethod
+    def delete_orders(cls):
+        db.session.query(cls).delete()
+        db.session.commit()

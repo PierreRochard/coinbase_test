@@ -12,8 +12,10 @@ class ExchangeService(object):
                   'quote_currency': p['quote_currency']} for p in products]
         return pairs
 
-    def get_orders(self, base_currency: str, quote_currency: str):
-        get_url = self.api_url + f'products/{base_currency}-{quote_currency}/book?level=2'
+    @classmethod
+    def get_orders(cls, base_currency: str, quote_currency: str):
+        path = f'products/{base_currency}-{quote_currency}/book?level=2'
+        get_url = cls.api_url + path
         order_book = requests.get(get_url).json()
         orders = []
         for side in ['bids', 'asks']:

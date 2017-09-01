@@ -1,0 +1,3 @@
+
+class UnsupportedActionError(Exception):
+    pass
