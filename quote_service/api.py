@@ -1,3 +1,4 @@
+from decimal import Decimal
 from flask_restful import Resource, reqparse
 
 from quote_service.queries.calculate_quote import calculate_quote
@@ -14,15 +15,15 @@ class QuoteService(Resource):
 
         args = parser.parse_args()
         req_action = args['action']
-        req_amount = args['amount']
+        req_amount = Decimal(args['amount'])
         req_base_currency = args['base_currency']
         req_quote_currency = args['quote_currency']
 
         pair_id, is_inverted = invert_pair(req_base_currency,
                                            req_quote_currency)
 
-
-
-        price, total = calculate_quote(pair_id, req_action, req_amount)
-
-        return dict(price='', total='', currency=req_quote_currency), 200
+        price = calculate_quote(pair_id, req_action, req_amount)
+        total = price * req_amount
+        return dict(price=str(price),
+                    total=str(total),
+                    currency=req_quote_currency), 200

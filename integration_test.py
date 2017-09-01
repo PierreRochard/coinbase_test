@@ -9,7 +9,7 @@ req_payloads = [
         'action': 'buy',
         'base_currency': 'BTC',
         'quote_currency': 'USD',
-        'amount': '1.00000000'
+        'amount': '50.00000000'
     },
     # {
     #     'action': 'sell',
