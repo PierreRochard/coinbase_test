@@ -61,5 +61,5 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal):
             .order_by(price_sorting)
             .scalar()
     )
-    Orders.delete_orders()
+    # Orders.delete_orders()
     return price

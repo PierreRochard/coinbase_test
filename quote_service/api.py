@@ -23,7 +23,20 @@ class QuoteService(Resource):
                                            req_quote_currency)
 
         price = calculate_quote(pair_id, req_action, req_amount)
+
+        if is_inverted:
+            price = 1/price
+
+        is_crypto = req_quote_currency in ['BTC', 'LTC', 'ETH']
+        if is_crypto:
+            rounding = 8
+        else:
+            rounding = 2
+
         total = price * req_amount
-        return dict(price=str(price),
-                    total=str(total),
+
+        price = str(round(price, rounding))
+        total = str(round(total, rounding))
+        return dict(price=price,
+                    total=total,
                     currency=req_quote_currency), 200

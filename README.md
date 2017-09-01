@@ -8,3 +8,4 @@
 6. To keep things simple I'm not implementing a caching strategy for the order books, we're going to get the relevant order book with each request.
 7. I have the products/pairs load once when the app starts, since that does not change often.
 8. Again to simplify, no asynchronous requests to GDAX or worrying about what happens if multiple requests come in simultaneously.
+9. Leverage the DB to perform the quote calculation instead of loading the data in memory. This is one of my pet-peeves, I think SQL is often underutilized.

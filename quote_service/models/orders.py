@@ -1,7 +1,6 @@
-from sqlite3 import IntegrityError
-
 from sqlalchemy import Column, ForeignKey, Integer, Numeric, String, \
     UniqueConstraint
+from sqlalchemy.exc import IntegrityError
 
 from quote_service.exchange_service import ExchangeService
 from quote_service.extensions import db
@@ -51,7 +50,7 @@ class Orders(db.Model):
             try:
                 db.session.commit()
             except IntegrityError:
-                continue
+                db.session.rollback()
 
     @classmethod
     def delete_orders(cls):
