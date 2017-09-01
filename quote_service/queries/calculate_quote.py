@@ -30,19 +30,23 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal):
     )
 
     price = (
-        db.session.query(func.sum(case(
-                             [
-                                 (cumulative_subquery.c.cumulative_size - amount <= 0,
-                                  Orders.size),
-                                 (cumulative_subquery.c.cumulative_size - amount > 0,
-                                  Orders.size - cumulative_subquery.c.cumulative_size + amount)
-                             ], else_=0) * Orders.price)/amount
-    )
-    .join(cumulative_subquery, cumulative_subquery.c.price == Orders.price)
-        .filter(Orders.side == side)
-        .filter(cumulative_subquery.c.cumulative_size - amount < Orders.size)
-        .order_by(Orders.price)
-        .scalar()
+        db.session.query(
+            func.sum(
+                case(
+                    [
+                        (cumulative_subquery.c.cumulative_size - amount <= 0,
+                         Orders.size),
+                        (cumulative_subquery.c.cumulative_size - amount > 0,
+                         Orders.size - cumulative_subquery.c.cumulative_size + amount)
+                    ],
+                    else_=0) * Orders.price) / amount
+        )
+            .join(cumulative_subquery,
+                  cumulative_subquery.c.price == Orders.price)
+            .filter(Orders.side == side)
+            .filter(cumulative_subquery.c.cumulative_size - amount < Orders.size)
+            .order_by(Orders.price)
+            .scalar()
     )
     Orders.delete_orders()
     return price
