@@ -1,3 +1,9 @@
+### Install
+
+Requires Python 3.6 and SQLite
+pip3 install -r requirements.txt
+python3 wsgi.py
+
 ### Decisions
 
 1. Python because I am familiar with it and it's easy for the reviewer to setup. I would otherwise do this with pl/pgSQL and PostgREST.
