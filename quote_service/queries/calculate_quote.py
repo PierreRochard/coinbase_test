@@ -6,7 +6,8 @@ from quote_service.extensions import db
 from quote_service.models.orders import Orders
 
 
-def calculate_quote(pair_id: int, action: str, amount: Decimal):
+def calculate_quote(pair_id: int, action: str, amount: Decimal,
+                    is_inverted: bool):
     Orders.insert_orders(pair_id)
 
     orders_1 = alias(Orders)
@@ -25,8 +26,9 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal):
     else:
         raise UnsupportedActionError()
 
-    cumulative_subquery = (
+    subquery = (
         db.session.query(orders_1.c.price.label('price'),
+                         func.sum(orders_2.c.size * orders_2.c.price).label('inverse_size'),
                          func.sum(orders_2.c.size).label('size'))
             .filter(cumulative_filter)
             .filter(orders_2.c.side == side)
@@ -36,28 +38,37 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal):
             .subquery()
     )
 
+    if is_inverted:
+        cumulative_size = subquery.c.inverse_size
+        size = Orders.inverse_size
+        multiplier = Orders.size
+    else:
+        cumulative_size = subquery.c.size
+        size = Orders.size
+        multiplier = Orders.price
+
     price = (
         db.session.query(
-            func.sum(
+            # func.sum(
                 case(
                     [
                         (
-                            cumulative_subquery.c.size - amount <= 0,
-                            Orders.size
+                            cumulative_size - amount <= 0,
+                            size
                         ),
                         (
-                            cumulative_subquery.c.size - amount > 0,
-                            Orders.size - cumulative_subquery.c.size + amount
+                            cumulative_size - amount > 0,
+                            size - cumulative_size + amount
                         )
                     ],
                     else_=0)
-                * Orders.price
-            ) / amount
+                * multiplier
+            # ) / amount
         )
-            .join(cumulative_subquery,
-                  cumulative_subquery.c.price == Orders.price)
+            .join(subquery,
+                  subquery.c.price == Orders.price)
             .filter(Orders.side == side)
-            .filter(cumulative_subquery.c.size - amount < Orders.size)
+            .filter(cumulative_size - amount < size)
             .order_by(price_sorting)
             .scalar()
     )

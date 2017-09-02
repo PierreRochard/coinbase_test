@@ -1,6 +1,7 @@
-from sqlalchemy import Column, ForeignKey, Integer, Numeric, String, \
-    UniqueConstraint
+from sqlalchemy import (Column, ForeignKey, Integer, Numeric, String,
+                        UniqueConstraint)
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from quote_service.exchange_service import ExchangeService
 from quote_service.extensions import db
@@ -31,6 +32,10 @@ class Orders(db.Model):
                      ForeignKey(CurrencyPairs.id),
                      nullable=False)
 
+    @hybrid_property
+    def inverse_size(self):
+        return self.price * self.size
+
     @classmethod
     def insert_orders(cls, pair_id):
         """
@@ -39,7 +44,7 @@ class Orders(db.Model):
         base, quote = (
             db.session.query(CurrencyPairs.base_currency,
                              CurrencyPairs.quote_currency)
-            .filter(CurrencyPairs.id == pair_id)
+                .filter(CurrencyPairs.id == pair_id)
                 .one()
         )
         orders = ExchangeService.get_orders(base, quote)

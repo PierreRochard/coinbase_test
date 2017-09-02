@@ -36,9 +36,7 @@ class QuoteService(Resource):
 
         # Todo: we need to calculate the quote on the inverted amount
         # possibly by flipping the action
-        price = calculate_quote(pair_id, req_action, req_amount)
-        if is_inverted:
-            price = 1 / price
+        price = calculate_quote(pair_id, req_action, req_amount, is_inverted)
 
         is_crypto = req_quote_currency in ['BTC', 'LTC', 'ETH']
         if is_crypto:
