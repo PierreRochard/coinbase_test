@@ -52,17 +52,9 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal,
         size = Orders.size
         multiplier = Orders.price
 
-
     price = (
         db.session.query(
             func.sum(
-            # Orders.price,
-            # Orders.size,
-            # subquery.c.size.label('cumulative_size'),
-            # size,
-            # cumulative_size,
-            # cumulative_size - amount,
-            # size,
                 case(
                     [
                         (
@@ -85,9 +77,4 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal,
             .order_by(price_sorting)
             .scalar()
     )
-    # for _ in range(0, 20):
-    #     print('****')
-    # for p in price:
-    #     print(p)
-    # Orders.delete_orders()
     return price
