@@ -4,4 +4,5 @@ class UnsupportedActionError(Exception):
 
 
 class UnsupportedAmountError(Exception):
-    pass
+    def __init__(self, max_amount):
+        self.max_amount = max_amount

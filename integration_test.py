@@ -5,12 +5,12 @@ import requests
 test_url = 'http://127.0.0.1:5000/'
 
 req_payloads = [
-    # {
-    #     'action': 'buy',
-    #     'base_currency': 'BTC',
-    #     'quote_currency': 'USD',
-    #     'amount': '5000000000'
-    # },
+    {
+        'action': 'buy',
+        'base_currency': 'BTC',
+        'quote_currency': 'USD',
+        'amount': '50'
+    },
     {
         'action': 'buy',
         'base_currency': 'USD',
@@ -21,14 +21,20 @@ req_payloads = [
         'action': 'sell',
         'base_currency': 'USD',
         'quote_currency': 'BTC',
-        'amount': '50000.00'
+        'amount': '50000000.00'
     },
-    # {
-    #     'action': 'sell',
-    #     'base_currency': 'BTC',
-    #     'quote_currency': 'USD',
-    #     'amount': '50.00000000'
-    # }
+    {
+        'action': 'sell',
+        'base_currency': 'BTC',
+        'quote_currency': 'USD',
+        'amount': '50.00000000'
+    },
+    {
+        'action': 'sell',
+        'base_currency': 'BTC',
+        'quote_currency': 'USD',
+        'amount': '50.00000000'
+    }
 ]
 
 for payload in req_payloads:

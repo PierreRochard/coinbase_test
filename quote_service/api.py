@@ -34,9 +34,10 @@ class QuoteService(Resource):
         pair_id, is_inverted = invert_pair(req_base_currency,
                                            req_quote_currency)
 
-        # Todo: we need to calculate the quote on the inverted amount
-        # possibly by flipping the action
-        price = calculate_quote(pair_id, req_action, req_amount, is_inverted)
+        try:
+            price = calculate_quote(pair_id, req_action, req_amount, is_inverted)
+        except UnsupportedAmountError as e:
+            return dict(message={'amount': f'Amount must be less than {e.max_amount}'}), 400
 
         is_crypto = req_quote_currency in ['BTC', 'LTC', 'ETH']
         if is_crypto:

@@ -1,7 +1,7 @@
 from decimal import Decimal
 from sqlalchemy import alias, func, case
 
-from quote_service.errors import UnsupportedActionError
+from quote_service.errors import UnsupportedActionError, UnsupportedAmountError
 from quote_service.extensions import db
 from quote_service.models.orders import Orders
 
@@ -37,15 +37,21 @@ def calculate_quote(pair_id: int, action: str, amount: Decimal,
             .group_by(orders_1.c.price)
             .subquery()
     )
+    _, max_inverted, max_ = db.session.query(subquery).order_by(subquery.c.size.desc()).first()
 
     if is_inverted:
+        if amount > max_inverted:
+            raise UnsupportedAmountError(max_inverted)
         cumulative_size = subquery.c.inverse_size
         size = Orders.inverse_size
         multiplier = 1 / Orders.price
     else:
+        if amount > max_:
+            raise UnsupportedAmountError(max_)
         cumulative_size = subquery.c.size
         size = Orders.size
         multiplier = Orders.price
+
 
     price = (
         db.session.query(
