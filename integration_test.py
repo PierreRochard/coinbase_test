@@ -1,4 +1,3 @@
-from mock import MagicMock, patch as mock_patch
 from pprint import pformat
 
 import pytest
@@ -15,68 +14,28 @@ def payload_fixture(action, base, quote, amount):
         'amount': amount
     }
 
-test_data = [
-    ('buy', 'BTC', 'USD', '50'),
-    ('sell', 'BTC', 'USD', '50'),
-]
+test_cases = [
+    # Simple case of taking out one order
+    # ('buy', 'BTC', 'USD', '50', '2500.00', '125000.00'),
+    # ('sell', 'BTC', 'USD', '50', '2000.00', '100000.00'),
+    # Taking out one and a half orders
+    ('buy', 'BTC', 'USD', '75', '2500.00', '125000.00'),
+    ('sell', 'BTC', 'USD', '75', '2000.00', '100000.00'),
 
+]
+params = 'action,base,quote,amount,expected_price,expected_total'
 
 class TestQuoteService(object):
+    @pytest.mark.parametrize(params, test_cases)
+    def test_buy_sell(self, action, base, quote, amount, expected_price,
+                      expected_total):
+        payload = payload_fixture(action, base, quote, amount)
+        response = requests.post(test_url, json=payload)
+        response_data = response.json()
 
-    @pytest.mark.parametrize('action,base,quote,amount', test_data)
-    def test_buy_sell(self, action, base, quote, amount):
-        with mock_patch('coinbase_test.exchange_service.ExchangeService') as MockExchangeService:
-            MockExchangeService.get_orders.return_value = mock_account
-            mock_account.owns = MagicMock(return_value=expected_value)
-            assert bool(auth(request, response, 'cb6847c45b4411e2bf0612313930ed44')) == expected_value
-
-    payload = payload_fixture(action, base, quote, amount)
-        api_response = requests.post(test_url, json=payload)
-
-        cb_response =
         print(pformat(payload))
-        print(response.status_code)
-        print(pformat(response.text))
         print(pformat(response.json()))
 
-
-
-req_payloads = [
-    {
-        'action': 'buy',
-        'base_currency': 'BTC',
-        'quote_currency': 'USD',
-        'amount': '50'
-    },
-    {
-        'action': 'buy',
-        'base_currency': 'USD',
-        'quote_currency': 'BTC',
-        'amount': '50000.00'
-    },
-    {
-        'action': 'sell',
-        'base_currency': 'USD',
-        'quote_currency': 'BTC',
-        'amount': '50000000.00'
-    },
-    {
-        'action': 'sell',
-        'base_currency': 'BTC',
-        'quote_currency': 'USD',
-        'amount': '50.00000000'
-    },
-    {
-        'action': 'sell',
-        'base_currency': 'BTC',
-        'quote_currency': 'USD',
-        'amount': '50.00000000'
-    }
-]
-
-# for payload in req_payloads:
-#     response = requests.post(test_url, json=payload)
-#     print(pformat(payload))
-#     print(response.status_code)
-#     print(pformat(response.text))
-#     print(pformat(response.json()))
+        # assert response_data['currency'] == quote
+        # assert response_data['price'] == expected_price
+        # assert response_data['total'] == expected_total

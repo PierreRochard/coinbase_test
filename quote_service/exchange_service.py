@@ -1,4 +1,7 @@
+import os
 import requests
+
+from quote_service.exchange_service_fixtures import mock_orders, mock_pairs
 
 
 class ExchangeService(object):
@@ -6,6 +9,8 @@ class ExchangeService(object):
 
     @classmethod
     def get_pairs(cls):
+        if os.environ.get('LOCAL_DEV', None):
+            return mock_pairs
         get_url = cls.api_url + 'products'
         products = requests.get(get_url).json()
         pairs = [{'base_currency': p['base_currency'],
@@ -14,6 +19,8 @@ class ExchangeService(object):
 
     @classmethod
     def get_orders(cls, base_currency: str, quote_currency: str):
+        if os.environ.get('LOCAL_DEV', None):
+            return mock_orders
         path = f'products/{base_currency}-{quote_currency}/book?level=2'
         get_url = cls.api_url + path
         order_book = requests.get(get_url).json()

@@ -1,3 +1,4 @@
 Flask-RESTful
+pytest
 requests
 sqlalchemy
