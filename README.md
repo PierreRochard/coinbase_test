@@ -4,6 +4,10 @@ Requires Python 3.6 and SQLite
 pip3 install -r requirements.txt
 python3 wsgi.py
 
+## Testing
+LOCAL_DEV=1 python3 wsgi.py 
+pytest integration_test.py 
+
 ### Decisions
 
 1. Python because I am familiar with it and it's easy for the reviewer to setup. I would otherwise do this with pl/pgSQL and PostgREST.
@@ -17,8 +21,8 @@ python3 wsgi.py
 9. Leverage the DB to perform the quote calculation instead of loading the data in memory. This is one of my pet-peeves, I think SQL is often underutilized.
 
 
-### Wishlist if I had more time
+### Wish list if I had more time
 
-1. Integration test for a range of values and for each pair, using mock data so test expectations can be hard coded.
+1. API server setup and teardown in the integration test so that exchange service methods can be properly patched with mock rather than relying on LOCAL_DEV environment variable.
 2. Unit tests for the different queries and methods.
-3. A live updating order book like I did with https://github.com/PierreRochard/coinbase-exchange-order-book using websockets so that we're not polling the Coinbase API with every request that comes in.
+3. A live updating order book like I did with https://github.com/PierreRochard/coinbase-exchange-order-book using websockets so that we're not polling the Coinbase API with every request that comes in (or caching and using stale data).
